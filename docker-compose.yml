@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./agents
+      dockerfile: Dockerfile
+    container_name: my_app
+    ports:
+      - "5000:5000"
+    networks:
+      - my_network
+
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile
+    container_name: my_grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/img:/usr/share/grafana/public/img
+      - ./grafana/dist:/app
+      - ./grafana/entrypoint.sh:/entrypoint.sh
+    networks:
+      - my_network
+
+  prometheus:
+    build:
+      context: ./prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - my_network
+
+  alertmanager:
+    build:
+      context: ./alertmanager
+      dockerfile: Dockerfile
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
